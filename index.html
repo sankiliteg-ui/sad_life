@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Quicksand', sans-serif;
+            transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+        .day-mode { background: #f8fafc; color: #334155; }
+        .night-mode { background: #020617; color: #f1f5f9; }
+
+        /* The Blinking Glow (The "Heartbeat" of the button) */
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 5px rgba(99, 102, 241, 0.4); }
+            50% { box-shadow: 0 0 25px rgba(99, 102, 241, 0.9), 0 0 40px rgba(99, 102, 241, 0.4); }
+            100% { box-shadow: 0 0 5px rgba(99, 102, 241, 0.4); }
+        }
+
+        /* Designful Switch Container */
+        .switch-box {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .switch { 
+            position: relative; width: 90px; height: 46px; 
+            border-radius: 50px;
+            animation: pulse-glow 2s infinite ease-in-out; /* The Blinking Light */
+        }
+
+        .slider { 
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background: #e2e8f0; transition: .5s; border-radius: 50px;
+        }
+
+        .slider:before {
+            position: absolute; content: ""; height: 38px; width: 38px; left: 4px; bottom: 4px;
+            background: white; transition: 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            border-radius: 50%;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        input:checked + .slider { background: #6366f1; }
+        input:checked + .slider:before { 
+            transform: translateX(44px);
+            background: #020617;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Particle Stars */
+        .star { position: absolute; background: white; border-radius: 50%; opacity: 0; transition: 1s; }
+        
+        /* Float Card */
+        .card {
+            transform: translateY(0);
+            animation: floating 4s ease-in-out infinite;
+        }
+        @keyframes floating {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body class="day-mode h-screen flex items-center justify-center p-6">
+
+    <div id="star-field" class="fixed inset-0 pointer-events-none"></div>
+
+    <main class="card relative z-10 w-full max-w-sm p-10 bg-white/10 border border-white/20 backdrop-blur-xl rounded-[50px] text-center shadow-2xl">
+        <h1 id="title" class="text-4xl font-bold mb-2 tracking-tight">Daylight</h1>
+        <p id="subtitle" class="text-xs uppercase tracking-[0.3em] opacity-50 mb-12">Active Mode</p>
+
+        <div class="switch-box flex flex-col items-center gap-4">
+            <label class="switch">
+                <input type="checkbox" id="sleepTrigger" class="hidden">
+                <span class="slider"></span>
+            </label>
+            <span class="text-[10px] font-bold opacity-60 uppercase mt-2">Press to Sleep</span>
+        </div>
+
+        <div id="nightMsg" class="mt-12 opacity-0 transition-all duration-1000 transform translate-y-6">
+            <p class="text-2xl font-light text-indigo-300">Good Night, <span class="font-bold">BRO</span></p>
+            <div class="w-8 h-[2px] bg-indigo-500/50 mx-auto mt-4 rounded-full"></div>
+            <p class="text-[11px] mt-4 opacity-40 leading-relaxed italic">"Rest well, dream big."</p>
+        </div>
+    </main>
+
+    <script>
+        const checkbox = document.getElementById('sleepTrigger');
+        const body = document.body;
+        const field = document.getElementById('star-field');
+        const nightMsg = document.getElementById('nightMsg');
+        const title = document.getElementById('title');
+        const subtitle = document.getElementById('subtitle');
+
+        checkbox.addEventListener('change', () => {
+            if(checkbox.checked) {
+                body.className = 'night-mode h-screen flex items-center justify-center p-6';
+                title.innerText = "Midnight";
+                subtitle.innerText = "Deep Sleep Mode";
+                nightMsg.classList.remove('opacity-0', 'translate-y-6');
+                createStars(true);
+            } else {
+                body.className = 'day-mode h-screen flex items-center justify-center p-6';
+                title.innerText = "Daylight";
+                subtitle.innerText = "Active Mode";
+                nightMsg.classList.add('opacity-0', 'translate-y-6');
+                createStars(false);
+            }
+        });
+
+        function createStars(show) {
+            field.innerHTML = '';
+            if(!show) return;
+            for (let i = 0; i < 100; i++) {
+                const s = document.createElement('div');
+                s.className = 'star';
+                const size = Math.random() * 2.5 + 'px';
+                s.style.width = size;
+                s.style.height = size;
+                s.style.top = Math.random() * 100 + '%';
+                s.style.left = Math.random() * 100 + '%';
+                s.style.opacity = Math.random();
+                field.appendChild(s);
+            }
+        }
+    </script>
+</body>
+</html>
